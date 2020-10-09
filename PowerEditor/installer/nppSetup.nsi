@@ -72,7 +72,8 @@ OutFile ".\build\npp.${APPVERSION}.Installer.exe"
 !define MUI_UNICON ".\images\npp_inst.ico"
 
 !define MUI_WELCOMEFINISHPAGE_BITMAP ".\images\wizard.bmp"
-;!define MUI_WELCOMEFINISHPAGE_BITMAP_NOSTRETCH
+;!define MUI_WELCOMEFINISHPAGE_BITMAP ".\images\wizard_GiletJaune.bmp"
+
 
 !define MUI_HEADERIMAGE
 !define MUI_HEADERIMAGE_BITMAP ".\images\headerLeft.bmp" ; optional
@@ -275,6 +276,6 @@ Section -FinishSection
   Call writeInstallInfoInRegistry
 SectionEnd
 
-BrandingText "The best things in life are free. Notepad++ is free. So Notepad++ is the best"
+BrandingText "Software is like sex: It's better when it's free"
 
 ; eof

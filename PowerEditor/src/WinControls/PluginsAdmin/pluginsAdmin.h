@@ -1,5 +1,5 @@
 // This file is part of Notepad++ project
-// Copyright (C)2017 Don HO <don.h@free.fr>
+// Copyright (C)2020 Don HO <don.h@free.fr>
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -44,10 +44,10 @@ struct Version
 	unsigned long _patch = 0;
 	unsigned long _build = 0;
 
-	Version() {};
+	Version() = default;
 	Version(const generic_string& versionStr);
 
-	void setVersionFrom(generic_string filePath);
+	void setVersionFrom(const generic_string& filePath);
 	generic_string toString();
 	bool isNumber(const generic_string& s) const {
 		return !s.empty() && 
@@ -89,7 +89,7 @@ struct PluginUpdateInfo
 	bool _isVisible = true;       // if false then it should not be displayed 
 
 	generic_string describe();
-	PluginUpdateInfo() {};
+	PluginUpdateInfo() = default;
 	PluginUpdateInfo(const generic_string& fullFilePath, const generic_string& fileName);
 };
 
@@ -112,11 +112,21 @@ struct NppCurrentStatus
 };
 
 enum COLUMN_TYPE { COLUMN_PLUGIN, COLUMN_VERSION };
+enum SORT_TYPE { DISPLAY_NAME_ALPHABET_ENCREASE, DISPLAY_NAME_ALPHABET_DECREASE };
+
+
+struct SortDisplayNameDecrease final
+{
+	bool operator() (PluginUpdateInfo* l, PluginUpdateInfo* r)
+	{
+		return (l->_displayName.compare(r->_displayName) <= 0);
+	}
+};
 
 class PluginViewList
 {
 public:
-	PluginViewList() {};
+	PluginViewList() = default;
 	~PluginViewList() {
 		_ui.destroy();
 		for (auto i : _list)
@@ -151,6 +161,8 @@ public:
 private:
 	std::vector<PluginUpdateInfo*> _list;
 	ListView _ui;
+
+	SORT_TYPE _sortType = DISPLAY_NAME_ALPHABET_ENCREASE;
 };
 
 enum LIST_TYPE { AVAILABLE_LIST, UPDATES_LIST, INSTALLED_LIST };
@@ -160,7 +172,7 @@ class PluginsAdminDlg final : public StaticDialog
 {
 public :
 	PluginsAdminDlg();
-	~PluginsAdminDlg() {};
+	~PluginsAdminDlg() = default;
 
     void init(HINSTANCE hInst, HWND parent)	{
         Window::init(hInst, parent);
@@ -188,7 +200,6 @@ public :
 
 	bool updateListAndLoadFromJson();
 	void setAdminMode(bool isAdm) { _nppCurrentStatus._isAdminMode = isAdm; };
-	generic_string getPluginConfigPath() const;
 
 	bool installPlugins();
 	bool updatePlugins();
@@ -196,6 +207,7 @@ public :
 
 	void changeTabName(LIST_TYPE index, const TCHAR *name2change);
 	void changeColumnName(COLUMN_TYPE index, const TCHAR *name2change);
+	generic_string getPluginListVerStr() const;
 
 protected:
 	virtual INT_PTR CALLBACK run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam);
@@ -218,13 +230,13 @@ private :
 	bool searchInPlugins(bool isNextMode) const;
 	const bool _inNames = true;
 	const bool _inDescs = false;
-	bool isFoundInAvailableListFromIndex(int index, generic_string str2search, bool inWhichPart) const;
-	long searchFromCurrentSel(generic_string str2search, bool inWhichPart, bool isNextMode) const;
-	long searchInNamesFromCurrentSel(generic_string str2search, bool isNextMode) const {
+	bool isFoundInAvailableListFromIndex(int index, const generic_string& str2search, bool inWhichPart) const;
+	long searchFromCurrentSel(const generic_string& str2search, bool inWhichPart, bool isNextMode) const;
+	long searchInNamesFromCurrentSel(const generic_string& str2search, bool isNextMode) const {
 		return searchFromCurrentSel(str2search, _inNames, isNextMode);
 	};
 
-	long searchInDescsFromCurrentSel(generic_string str2search, bool isNextMode) const {
+	long searchInDescsFromCurrentSel(const generic_string& str2search, bool isNextMode) const {
 		return searchFromCurrentSel(str2search, _inDescs, isNextMode);
 	};
 	
